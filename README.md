@@ -7,7 +7,7 @@ milhares de vezes, com o ritmo de gols de cada um pelo clube e os jogos reais do
 
 ## O que os números mostram
 
-Dados de 18/10/2026, recorte padrão da página (ponderado ótimo, 10.000 simulações).
+Dados de 18/10/2026, na publicação, recorte padrão da página (ponderado ótimo, 10.000 simulações). A página se atualiza toda semana; estes números, não.
 
 - **Placar:** CR7 tem 981 gols oficiais e precisa de mais 19. Messi tem 936 e precisa de 64.
 - **CR7 chega primeiro em todas as 10.000 simulações.** O milésimo dele sai, na mediana, em abril de 2027 (80% das
@@ -48,7 +48,7 @@ python -I tools/imagem_x.py              # cartão
 python -I tools/build_artifact.py        # opcional: versão Artifact
 ```
 
-O calendário futuro (`data/sources/fixtures.csv`) é editado à mão. Os jogos disputados saem sozinhos, mas jogos novos,
+Uma GitHub Action (`.github/workflows/atualizar.yml`) roda esses três passos toda segunda de manhã e sobe o que mudou; dá para disparar à mão na aba Actions. O calendário futuro (`data/sources/fixtures.csv`) é editado à mão. Os jogos disputados saem sozinhos, mas jogos novos,
 adiados ou de mata-mata precisam entrar no arquivo. No GitHub Pages a página usa o retrato de `data/data.js`; para ver
 os dados de agora, rode `python -I tools/servidor.py`. O endereço do histórico no messivsronaldo.app é um JSON interno
 do site, sem documentação, e pode mudar sem aviso.

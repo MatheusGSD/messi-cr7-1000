@@ -1,0 +1,31 @@
+# Toda segunda de manhã: baixa o histórico de agora do messivsronaldo.app, refaz data/data.js, o cartão e a versão
+# Artifact, e sobe se algo mudou. O calendário futuro (data/sources/fixtures.csv) continua à mão.
+name: Atualizar dados
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'   # segunda, 9h UTC (6h em Brasília)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -I tools/build_data.py --baixar
+      - run: python -I tools/imagem_x.py
+      - run: python -I tools/build_artifact.py
+      - name: Sobe se mudou
+        run: |
+          git add -A data imagem_x.png dist
+          if git diff --cached --quiet; then echo "nada novo"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Dados atualizados em $(date -u +%d/%m/%Y)"
+          git push
