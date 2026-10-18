@@ -1,2 +1,8 @@
 __pycache__/
 *.pyc
+
+# vídeos de divulgação
+clips/
+
+# rascunhos pessoais (textos para redes)
+rascunhos/

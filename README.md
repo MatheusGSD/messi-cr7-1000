@@ -1,24 +1,71 @@
 # Corrida ao Gol 1000
 
-Simulação Monte Carlo de quem chega primeiro ao milésimo gol oficial: Messi ou Cristiano Ronaldo.
-Pelo servidor, os dados são os de agora; aberta com dois cliques, vale o último retrato gerado (a data aparece no topo da página).
+Messi ou Cristiano Ronaldo: quem chega primeiro ao milésimo gol oficial, e quando? Este repositório simula a corrida
+milhares de vezes, com o ritmo de gols de cada um pelo clube e os jogos reais do calendário.
 
-- `index.html`: rode `python -I tools/servidor.py` e abra http://localhost:8765/index.html. A página baixa o histórico jogo a jogo de agora do messivsronaldo.app (`/api/corrida`), a mesma contagem da imprensa. O site não libera CORS, por isso o servidor. Aberta com dois cliques, ou publicada como Artifact, a página usa `data/data.js`. As fontes vêm do Google Fonts; o resto funciona offline.
-- `data/data.json` e `data/data.js`: o retrato usado sem servidor (o `.js` é o mesmo JSON, para abrir sem servidor).
-- `data/sources/`: dados brutos (histórico jogo a jogo do messivsronaldo.app, calendário, notas). O calendário e as notas são de 10/10/2026.
-- `sim.js`: motor da simulação. `app.js`: interface e gráficos.
+**Página:** https://matheusgsd.github.io/messi-cr7-1000/
 
-## Atualizar os dados
+## O que os números mostram
 
-- **Retrato** (versão offline e Artifact): `python -I tools/build_data.py --baixar` baixa o histórico de agora para `data/sources/` e refaz `data/data.js`. Depois, `python -I tools/build_artifact.py` refaz `dist/index.html`.
-- **Calendário futuro** (`data/sources/fixtures.csv`): continua à mão. Os jogos já disputados saem sozinhos, mas jogos novos (mata-mata, temporada seguinte) precisam entrar no arquivo.
-- O endereço do histórico no messivsronaldo.app é o JSON interno do site, que não é documentado e pode mudar sem aviso.
+Dados de 18/10/2026, recorte padrão da página (ponderado ótimo, 10.000 simulações).
 
-## Calculadora: gol 1000 de qualquer jogador
+- **Placar:** CR7 tem 981 gols oficiais e precisa de mais 19. Messi tem 936 e precisa de 64.
+- **CR7 chega primeiro em todas as 10.000 simulações.** O milésimo dele sai, na mediana, em abril de 2027 (80% das
+  simulações entre fevereiro e maio de 2027), em cerca de 24 jogos do Al-Nassr.
+- **Messi:** mediana em novembro de 2028 (80% entre agosto de 2028 e agosto de 2029), em cerca de 73 jogos do Inter
+  Miami.
+- **Messi marca mais por jogo** (0,87 contra 0,78 no recorte padrão), mas a vantagem de 45 gols do CR7 pesa mais. Só o
+  recorte pós-Copa, de poucos jogos, dá alguma chance ao Messi: 7,8%.
 
-`jogador.html` mostra um jogador por vez, com meta sempre 1000. Para quem está em atividade, simula a chance de chegar ao gol 1000 antes da aposentadoria. Para todos, inclusive aposentados e lendas, calcula com que idade o gol 1000 sairia se ele nunca parasse, por absurda que seja a idade.
+## Como foi feito
 
-- Rode `python -I tools/servidor.py`, que abre http://localhost:8765/jogador.html. A página precisa do servidor: a busca por nome da Transfermarkt não pode ser lida direto pelo navegador (CORS).
-- **Jogadores da Transfermarkt:** a carreira oficial vem jogo a jogo, ao vivo, por endpoints não documentados, que podem mudar ou ser bloqueados sem aviso. Contam os jogos do time principal e da seleção principal. Ficam de fora base, reserva e seleção olímpica. Por essa regra, o Messi fecha em 932 gols e o CR7 em 974 (a imprensa dá 980 para o CR7).
-- **Lendas** (Pelé, Romário, Bican, Puskás, Gerd Müller e Eusébio): a Transfermarkt não tem o futebol antigo, então os dados vêm de `data/sources/lendas.json`. São jogos e gols oficiais por temporada, levantados em Wikipedia, RSSSF e Guinness, com fontes e notas por jogador. Rode `python -I tools/build_lendas.py` para gerar `data/lendas.json`. Quem não tem temporadas de clube fica de fora, como o Túlio Maravilha.
-- `jogador.js` usa o mesmo motor (`sim.js`) e a mesma meia-vida da corrida Messi × CR7. O calendário futuro é sintético: N jogos oficiais por ano, ajustável na página.
+Cada simulação sorteia um ritmo de gols por jogo para cada jogador (posteriori Gamma de um modelo Poisson, com priori
+de Jeffreys) e depois os gols de cada jogo futuro do clube, em ordem, até chegar a 1000. O recorte padrão usa todos os
+jogos de clube desde julho de 2019, com peso que cai pela metade a cada 365 dias; essa meia-vida foi a que melhor
+previu, no passado, os gols dos 20 jogos seguintes. A página explica o resto e deixa trocar o recorte.
+
+Premissas: os dois jogam todos os jogos do clube, sem lesão, aposentadoria ou queda por idade. Gols por seleção contam
+no total, mas não entram na projeção. O calendário só tem jogos garantidos; depois da última data publicada, segue o
+formato de cada liga. Os detalhes estão no cabeçalho de `tools/build_data.py`.
+
+| Arquivo | O que faz |
+| --- | --- |
+| `index.html`, `app.js` | A página: placar, gráficos, replay de uma simulação |
+| `sim.js` | Motor da simulação, com semente fixa (a mesma simulação sempre se repete igual) |
+| `tools/build_data.py` | Monta `data/data.js` com o histórico e o calendário; `--baixar` busca o histórico de agora |
+| `tools/servidor.py` | Serve a página com o histórico ao vivo do messivsronaldo.app (`/api/corrida`) |
+| `tools/imagem_x.py` | Cartão 1600 × 900 para redes sociais e prévia de link (`imagem_x.png`), a partir de `tools/cartao.html` |
+| `tools/build_artifact.py` | Versão da página para publicar como Artifact no claude.ai (`dist/index.html`) |
+
+Dados em `data/sources/`: histórico jogo a jogo do messivsronaldo.app, calendário futuro (`fixtures.csv`, levantado em
+10/10/2026 e revisto em 18/10/2026) e notas sobre o calendário de cada liga.
+
+## Atualizar
+
+```
+python -I tools/build_data.py --baixar   # histórico de agora e data/data.js
+python -I tools/imagem_x.py              # cartão
+python -I tools/build_artifact.py        # opcional: versão Artifact
+```
+
+O calendário futuro (`data/sources/fixtures.csv`) é editado à mão. Os jogos disputados saem sozinhos, mas jogos novos,
+adiados ou de mata-mata precisam entrar no arquivo. No GitHub Pages a página usa o retrato de `data/data.js`; para ver
+os dados de agora, rode `python -I tools/servidor.py`. O endereço do histórico no messivsronaldo.app é um JSON interno
+do site, sem documentação, e pode mudar sem aviso.
+
+Precisa de Python 3. O cartão precisa do Chrome ou do Edge.
+
+## Fontes
+
+- Gols jogo a jogo: [messivsronaldo.app](https://www.messivsronaldo.app/), a contagem da imprensa (Opta, AFP, AP/ESPN,
+  EFE), conferida com o [Transfermarkt](https://www.transfermarkt.com/).
+- Calendário: Transfermarkt, ESPN, Wikipedia e MLS. Cada jogo de `fixtures.csv` tem as fontes na própria linha.
+
+## Licença
+
+Código sob a licença MIT (`LICENSE`). Os dados montados aqui (`data/data.json`, `data/data.js` e
+`data/sources/fixtures.csv`) ficam sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.pt-br): pode
+reusar, citando Matheus Dalmolin e o messivsronaldo.app. Os arquivos `data/sources/mvr_*.json` são cópia do que o
+messivsronaldo.app publica e seguem as condições do site.
+
+A calculadora do gol 1000 para qualquer jogador, que começou aqui, virou outro projeto.

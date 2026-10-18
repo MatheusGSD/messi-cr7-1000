@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Corrida ao Gol 1000</title>
+<meta name="description" content="Messi ou Cristiano Ronaldo: quem chega primeiro ao milésimo gol oficial, e quando? Simulação Monte Carlo com os jogos reais de cada um pelo clube.">
+<meta property="og:title" content="Corrida ao Gol 1000: Messi × CR7">
+<meta property="og:description" content="Quem chega primeiro ao milésimo gol oficial, e quando? Milhares de temporadas simuladas com os jogos reais de cada um pelo clube.">
+<meta property="og:image" content="https://matheusgsd.github.io/messi-cr7-1000/imagem_x.png">
+<meta property="og:url" content="https://matheusgsd.github.io/messi-cr7-1000/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -334,6 +340,7 @@ td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
 #hl { height: 170px; }
 .sources a { color: var(--fg); }
 footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
+footer a { color: var(--fg); overflow-wrap: anywhere; }
 
 @media (max-width: 760px) {
   .board { grid-template-columns: 1fr 1fr; padding: 14px; }
@@ -594,16 +601,16 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     </div>
   </section>
 
-  <footer><span id="dataNote">Dados de 18/10/2026.</span> Simulação feita no seu navegador. Nada aqui é previsão oficial.</footer>
+  <footer><span id="dataNote">Dados de 18/10/2026.</span> Simulação feita no seu navegador. Nada aqui é previsão oficial. Levantamento de Matheus Dalmolin. Código sob licença MIT: <a href="https://github.com/MatheusGSD/messi-cr7-1000" target="_blank" rel="noopener">github.com/MatheusGSD/messi-cr7-1000</a>.</footer>
 </div>
 <script src="data/data.js"></script>
 <script src="sim.js"></script>
 <script>
-/* Pelo tools/servidor.py, a corrida usa o jogo a jogo de agora do messivsronaldo.app (/api/corrida). Aberta com dois
-   cliques ou publicada como Artifact, não há servidor e fica o retrato de data/data.js. */
+/* Pelo tools/servidor.py, a corrida usa o jogo a jogo de agora do messivsronaldo.app (/api/corrida). No GitHub Pages,
+   aberta com dois cliques ou publicada como Artifact, não há servidor e fica o retrato de data/data.js. */
 (function () {
   const start = () => { const s = document.createElement('script'); s.src = 'app.js'; document.body.appendChild(s); };
-  if (!/^https?:$/.test(location.protocol)) return start();
+  if (!/^https?:$/.test(location.protocol) || !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return start();
   document.getElementById('dataStamp').textContent = 'buscando dados ao vivo…';
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000);
   fetch('api/corrida', { signal: ctl.signal, cache: 'no-store' })
