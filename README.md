@@ -3,7 +3,7 @@
 Messi ou Cristiano Ronaldo: quem chega primeiro ao milésimo gol oficial, e quando? Este repositório simula a corrida
 milhares de vezes, com o ritmo de gols de cada um pelo clube e os jogos reais do calendário.
 
-**Página:** https://matheusgsd.github.io/messi-cr7-1000/
+**Página:** https://dalmolin.dev/messi-cr7-1000/
 
 ## O que os números mostram
 
